@@ -1,0 +1,216 @@
+________________________________________________________________________
+
+Firebase Integration: Se integró Firebase para la autenticación y la base de datos en tiempo real (realtime DB).
+
+CRUD Operations: Se implementaron operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para las tareas, asegurando de usar el uid del usuario para separar las tareas de diferentes usuarios.
+
+Componentes React: Se utilizaron componentes de React bien definidos (TaskForm, EditTaskForm, TaskItem) para manejar diferentes aspectos de las tareas.
+
+Estado Reactivo: Se utilizó el estado reactivo (useState) de manera efectiva para manejar la lista de tareas y otros estados locales en los componentes.
+
+Operaciones Asincrónicas: Se utilizaron operaciones asincrónicas (como agregar, editar, eliminar y completar tareas) de manera adecuada con async/await y manejo de errores.
+________________________________________________________________________
+
+A destacar:
+
+- Uso de la librería uuid para generar identificadores únicos (UUID) para las tareas.
+-Uso de React hooks como useState y useEffect para manejar el estado y efectos secundarios de una tarea.
+-Integración de Firebase para la base de datos en tiempo real
+
+________________________________________________________________________
+
+EditTaskForm (EditTaskForm.js):
+
+-Permite editar una tarea existente.
+-Muestra un formulario con un campo de texto para la tarea y un selector para la prioridad.
+-Permite actualizar la tarea y la prioridad cuando se envía el formulario.
+
+TaskForm (TaskForm.js):
+
+-Permite agregar nuevas tareas.
+-Muestra un formulario con un campo de texto para introducir una nueva tarea y un selector para la prioridad.
+-Permite agregar la tarea a la lista cuando se envía el formulario.
+
+TaskItem (TaskItem.js):
+
+-Representa visualmente una tarea en la lista.
+-Muestra el texto de la tarea, su prioridad y si está completada o no.
+-Proporciona opciones para marcar como completada, editar o eliminar la tarea.
+
+TaskTable (TaskTable.js):
+
+-Muestra todas las tareas en forma de tabla.
+-Cada tarea se muestra en una fila con sus detalles (texto, prioridad).
+-Proporciona botones en cada fila para marcar como completada, editar o eliminar la tarea.
+
+TaskManager (TaskManager.js):
+
+-Es el componente principal que gestiona todas las tareas.
+-Contiene la lógica principal para agregar, editar, completar y eliminar tareas.
+-Renderiza TaskForm para agregar nuevas tareas y TaskTable para mostrar y manipular las tareas existentes.
+-Incluye funcionalidad para ordenar las tareas por prioridad.
+
+________________________________________________________________________
+
+creé una to-do app super básica con react al que le puse lo siguiente:
+
+ToDo.js:
+import React from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPenToSquare } from '@fortawesome/free-regular-svg-icons'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
+
+export const ToDo = ({task, toggleComplete, deleteToDo, editToDo}) => {
+ return (
+  <div className='todo'>
+    <p onClick={() => toggleComplete(task.id)} className={`${task.completed ? 'completed' : ""}`}>{task.task}</p>
+    <div>
+      <FontAwesomeIcon icon={faPenToSquare} onClick={() => editToDo(task.id)}/>
+      <FontAwesomeIcon icon={faTrash} onClick={() => deleteToDo(task.id)}/>
+    </div>
+  </div>
+ )
+}
+___
+
+ToDoForm.js:
+import React, { useState } from 'react';
+
+export const ToDoForm = ({addToDo}) => {
+  const [value, setValue] = useState("")
+
+  const handleSubmit = e => {
+   e.preventDefault();
+   addToDo(value);
+   setValue("");
+  }
+ return (
+  <form className='todoform' onSubmit={handleSubmit}>
+    <input type="text" className='input' value={value} placeholder='What is the task today?' onChange={(e) => setValue(e.target.value)} />
+    <button type='submit' className='btn'>Add Task</button>
+  </form>
+ )
+}
+
+__
+
+container.js:
+import React, { useState } from 'react';
+import { ToDoForm } from './ToDoForm';
+import { v4 as uuidv4 } from 'uuid';
+import { ToDo } from './ToDo';
+import { EditToDoForm } from './EditToDoForm';
+uuidv4();
+
+export const container = () => {
+  const [toDos, setToDos] = useState([])
+
+  const addToDo = toDo => {
+   setToDos([...toDos, {id: uuidv4(), task: toDo, completed: false, isEditing: false}])
+  }
+
+  const toggleComplete = id => {
+   setToDos(toDos.map(toDo => toDo.id === id ? {...
+    toDo, completed: !toDo.completed} : toDo))
+  }
+
+  const deleteToDo = id => {
+   setToDos(toDos.filter(toDo => toDo.id !== id))
+  }
+
+  const editToDo = id => {
+   setToDos(toDos.map(toDo => toDo.id === id ? {...
+    toDo, isEditing: !toDo.isEditing} : toDo))
+  }
+
+  const editTask = (task, id) => {
+   setToDos(toDos.map(toDo => toDo.id === id ? {...
+    toDo, task, isEditing: !toDo.isEditing} : toDo))
+  }
+   
+ return (
+  <div className="container">
+   <h1>Get Things Done!</h1>
+    <ToDoForm addToDo={addToDo}/> { /*with this I import the state value from todoform */ }
+    { /*add value to the state */ }
+    {toDos.map((toDo, index) => (
+     toDo.isEditing ? (
+      <EditToDoForm editToDo={editTask} task={toDo} />
+     ) : (
+      <ToDo task={toDo} key={index} toggleComplete={toggleComplete} deleteToDo={deleteToDo} editToDo={editToDo}/> 
+     )
+    ))}
+  </div>
+ )
+}
+
+__
+
+EditToDoForm.js:
+import React, { useState } from 'react';
+
+export const EditToDoForm = ({editToDo, task}) => {
+  const [value, setValue] = useState(task.task)
+
+  const handleSubmit = e => {
+   e.preventDefault();
+   editToDo(value, task.id);
+   setValue("");
+  }
+ return (
+  <form className='todoform' onSubmit={handleSubmit}>
+    <input type="text" className='input' value={value} placeholder='Update Task' onChange={(e) => setValue(e.target.value)} />
+    <button type='submit' className='btn'>Update Task</button>
+  </form>
+ )
+}
+____
+
+- ToDo.js: Define el componente ToDo que muestra una tarea individual, incluyendo la capacidad de marcarla como completada y botones para editar o eliminar la tarea.
+- ToDoForm.js: Define el componente ToDoForm que permite al usuario ingresar una nueva tarea y agregarla a la lista.
+- container.js: Define el componente container que gestiona el estado general de la aplicación, incluyendo la lista de tareas, y renderiza los componentes ToDoForm y ToDo según sea necesario. Además, implementa funciones para agregar, marcar como completada, eliminar y editar tareas.
+- EditToDoForm.js: Define el componente EditToDoForm que se utiliza para editar una tarea existente.
+____
+
+useState para el Usuario Autenticado:
+
+useState se utiliza para manejar el estado del usuario autenticado (user). Inicialmente se establece en null.
+useEffect para el Listener de Auth:
+
+useEffect se utiliza para suscribirse a cambios en el estado de autenticación utilizando auth.onAuthStateChanged.
+Cuando el estado de autenticación cambia, se actualiza el estado user con el usuario autenticado o null si no hay usuario.
+Renderizado Condicional del Componente container:
+
+El componente container se renderiza solo si user está definido (es decir, hay un usuario autenticado).
+Si no hay usuario autenticado, se muestra un mensaje junto con el botón de inicio de sesión con Google (SignInWithGoogleButton).
+____
+
+me interesan las siguientes cosas:
+
+Priorizar tareas: Permite al usuario establecer una prioridad para cada tarea (alta, media, baja).
+Categorizar tareas: Implementa categorías para organizar las tareas por tema, proyecto o área de enfoque.
+Subtareas: Permite crear subtareas dentro de tareas más grandes para desglosarlas en pasos más pequeños.
+Fechas límite: Añade la posibilidad de establecer fechas límite para las tareas con notificaciones opcionales.
+Filtros y búsquedas: Permite al usuario filtrar las tareas por estado, prioridad, categoría o fecha límite.
+Estadísticas: Muestra al usuario estadísticas sobre su progreso, como el porcentaje de tareas completadas o la cantidad de tareas realizadas por categoría.
+Arrastrar y soltar: Permite al usuario reordenar las tareas arrastrándolas y soltándolas.
+
+cómo las hago?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
