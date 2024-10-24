@@ -1,17 +1,9 @@
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { TaskItem } from './TaskItem';
-import { addTaskToDatabase, fetchTasks, updateTaskInDatabase, deleteTaskFromDatabase } from '../../utils/database';
+import { updateTaskInDatabase, deleteTaskFromDatabase } from '../../utils/database';
 
 
 const TaskGrid = ({ user, tasks, setTasks }) => {
-  const priorityColors = {
-    high: '#BF0603',
-    medium: '#FFE347',
-    low: '#A2FAA3',
-  }; 
-  
   const toggleComplete = async (id) => {
     const updatedTasks = tasks.map(task =>
       task.id === id ? { ...task, completed: !task.completed } : task

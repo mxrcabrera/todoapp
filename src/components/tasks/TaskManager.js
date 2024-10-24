@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { TaskForm } from './TaskForm';
 import TaskGrid from './TaskGrid';
 import { v4 as uuidv4 } from 'uuid';
-import { addTaskToDatabase, fetchTasks, updateTaskInDatabase, deleteTaskFromDatabase } from '../../utils/database';
+import { addTaskToDatabase, fetchTasks } from '../../utils/database';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { db } from '../../firebase/firebase';
 
 
 const TaskManager = () => {

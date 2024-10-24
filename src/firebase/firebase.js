@@ -1,18 +1,4 @@
 import { initializeApp } from "firebase/app";
-import {
-  GoogleAuthProvider,
-  getAuth,
-  signInWithRedirect,
-  signOut,
-  sendEmailVerification,
-  updateEmail,
-  updatePassword,
-  sendPasswordResetEmail,
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  getRedirectResult,
-} from "firebase/auth";
-
 import { getDatabase } from 'firebase/database'
 import { getStorage } from 'firebase/storage'
 
